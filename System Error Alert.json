@@ -1,0 +1,70 @@
+{
+  "name": "System Error Alert",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f4ae56f2-dd21-4e88-9d9e-0c0840c30434"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1344372578754545",
+        "recipientPhoneNumber": "+2349118239822",
+        "textBody": "={{ '⚠️ System error in \"' + $json.workflow.name + '\" at node \"' + $json.execution.lastNodeExecuted + '\": ' + $json.execution.error.message }}",
+        "additionalFields": {}
+      },
+      "name": "Alert Owner Of Error",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        0
+      ],
+      "id": "ceb488e3-2ad4-4dee-ba18-74516e15961b",
+      "webhookId": "4a057e3a-c0e1-4c30-8710-84ca8e9f1c11",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Llcq0yxNQb7rGWbB",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Alert Owner Of Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "EhLsYMkj7Kfv4U3d",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "8e003900-1d68-4169-90a8-98798f334f61",
+  "meta": {
+    "instanceId": "cfca839f3bae63c7536b8212d32611bf29e318c168fc8e4b2c2c1324df7462be"
+  },
+  "nodeGroups": [],
+  "id": "EhLsYMkj7Kfv4U3d",
+  "tags": []
+}
