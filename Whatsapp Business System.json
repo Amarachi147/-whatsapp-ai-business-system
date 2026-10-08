@@ -1,0 +1,1387 @@
+{
+  "name": "Whatsapp Business System",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1856,
+        -112
+      ],
+      "id": "39b3adfd-c515-4082-b344-fed356af55d9",
+      "webhookId": "ff8df190-2882-4454-9b33-e8267b162f07",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "srUe6JuJxF0usp1O",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "phone",
+              "value": "={{ $json.messages[0].from }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "name",
+              "value": "={{ $json.contacts[0].profile.name }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "text",
+              "value": "={{ $json.messages[0].text ? $json.messages[0].text.body : '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Extract Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1632,
+        -112
+      ],
+      "id": "8a00dfa6-e180-4395-b80c-0a0ab7d285b7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Is Text Message",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1408,
+        -112
+      ],
+      "id": "a654be3e-bbea-474a-9974-ea9eb8d806d7"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "=appXkPqjhGYqthFL7"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXEGkZFoErGQx6F",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appXkPqjhGYqthFL7/tblXEGkZFoErGQx6F"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Bot",
+                  "value": "Bot"
+                },
+                {
+                  "name": "Human",
+                  "value": "Human"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "Upsert Customer",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -1200,
+        -128
+      ],
+      "id": "95940cc2-63d8-4c27-a71f-2f5043dc30b3",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zSR1HswGqLzJ748p",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Human",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Human Handling?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -976,
+        -112
+      ],
+      "id": "346d2009-eb49-47ae-b159-0881b628a97e"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "=appXkPqjhGYqthFL7",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblb7fBpGWAC9A79r",
+          "mode": "list",
+          "cachedResultName": "Conversations",
+          "cachedResultUrl": "https://airtable.com/appXkPqjhGYqthFL7/tblb7fBpGWAC9A79r"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone": "={{ $('Extract Message').item.json.phone }}",
+            "CustomerMessage": "={{ $('Extract Message').item.json.text }}",
+            "HandledBy": "Human"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "CustomerMessage",
+              "displayName": "CustomerMessage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "BotReply",
+              "displayName": "BotReply",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "HandledBy",
+              "displayName": "HandledBy",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Bot",
+                  "value": "Bot"
+                },
+                {
+                  "name": "Human",
+                  "value": "Human"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "Log Human Message",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        -304
+      ],
+      "id": "f91daedd-aaf4-476e-a948-c07b55dd7808",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zSR1HswGqLzJ748p",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1344372578754545",
+        "recipientPhoneNumber": "+2349118239822",
+        "textBody": "={{ '💬 ' + $('Extract Message').item.json.name + ' (' + $('Extract Message').item.json.phone + '): ' + $('Extract Message').item.json.text }}",
+        "additionalFields": {}
+      },
+      "name": "Forward To Owner",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        -304
+      ],
+      "id": "d48acb04-3c7b-4196-b955-fb6a843f8933",
+      "webhookId": "9b420fff-0f1b-4724-ba0a-bad67dbf7fa7",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Llcq0yxNQb7rGWbB",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Extract Message').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the WhatsApp sales assistant for Prime Motors Naija, a car dealership in Ikeja, Lagos, Nigeria. We sell quality foreign-used (tokunbo) cars and a few Nigerian-used cars.\n\nCURRENT DATE AND TIME\n{{ $now }}\n\nPERSONALITY\nWarm, professional and brief. Use simple English (you can understand Pidgin, but reply in simple English). Maximum 4 short sentences per reply. At most one emoji. Ask only one question at a time.\n\nYOUR TOOLS\n1. Knowledge Base tool: our cars, prices, colours, mileage, engines, showroom address, hours, payment, delivery, documents and policies.\n2. Check Availability tool: checks whether an inspection time slot is free on our calendar.\n3. Create Event tool: books an inspection on our calendar.\n\nKNOWLEDGE BASE RULES\n- For ANY question about cars, prices, features, location, hours, payment, delivery, documents or policies, ALWAYS search the Knowledge Base tool first.\n- Answer only from what the tool returns. Never invent a car, price, colour, discount or policy.\n- If the tool returns nothing relevant, escalate to a human.\n\nQUICK PRICE REFERENCE (backup only. If the Knowledge Base differs, trust the Knowledge Base)\nToyota Corolla 2014: ₦8,500,000 | Toyota Camry 2012: ₦9,200,000 | Toyota Camry 2016: ₦14,500,000 | Honda Accord 2010: ₦6,300,000 | Toyota RAV4 2013: ₦12,800,000 | Toyota Highlander 2012: ₦13,500,000 | Lexus RX350 2012: ₦15,800,000 | Mercedes-Benz C300 2012: ₦14,200,000 | Toyota Sienna 2011: ₦9,800,000 | Toyota Corolla 2009 (Nigerian-used): ₦4,200,000\n\nHELPING CUSTOMERS\n- Help the customer choose a car using their budget, car type (sedan, SUV, family car) and needs.\n- Do not promise a car is still available. Say the team will confirm availability.\n- Payment is by bank transfer only. Never ask for or share account numbers or payment details in chat.\n- Stay on topic (cars and our dealership). Politely decline anything else.\n\nBOOKING AN INSPECTION\n- Inspections last 1 hour, Monday to Saturday, 9am to 5pm only. No Sundays.\n- Collect: customer name, the car, and the preferred day and time. Ask one question at a time.\n- Use the Check Availability tool to confirm the slot is free. If it is taken, offer the nearest free slot.\n- After the customer confirms the slot, use the Create Event tool. Put the customer's name, phone number and car in the description.\n- Confirm the booking with the date and time ONLY if the Create Event tool succeeded.\n- If a calendar tool fails, do not guess. Escalate to a human.\n\nWHEN TO ESCALATE TO A HUMAN\nSet escalate to true, with a short reason, when the customer:\n- asks to speak to a human, the owner or a manager\n- asks for a discount or wants to negotiate the price\n- asks for a car that is not in the Knowledge Base\n- asks about trade-ins, installments, financing or delivery outside Lagos\n- is angry, complaining or says they were scammed\n- asks about a payment they made\n- asks something you cannot answer from the Knowledge Base\n- you cannot complete a booking because a tool failed\nWhen you escalate: your reply must say a team member will reply shortly, and you must NOT ask the customer any further question. Do not negotiate or make promises yourself.\n\nOUTPUT FORMAT\nAlways respond in the required JSON format:\n- reply: the message to send to the customer\n- escalate: true or false\n- reason: a short reason if escalate is true, otherwise an empty string\n\nCUSTOMER NAME\n- If the customer tells you their name, put it in customer_name. Otherwise leave customer_name empty.\n- When booking an inspection, ask for the customer's name if you don't have it.\n- On a handoff, never delay it to ask for a name. Escalate right away. The team already has their number.\n- Do not ask for a name during normal questions about cars, prices or policies."
+        }
+      },
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -752,
+        48
+      ],
+      "id": "c2ac98b8-2d06-4ee8-9cdb-41d5fc5b6f47",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1152,
+        192
+      ],
+      "id": "3d892289-5369-4917-9bbd-b8771df960b3",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Extract Message').item.json.phone }}",
+        "contextWindowLength": 10
+      },
+      "name": "Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1088,
+        336
+      ],
+      "id": "01bcbb8a-245d-47bf-8cb6-5b6f1fa55c8b"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"reply\": { \"type\": \"string\" },\n    \"escalate\": { \"type\": \"boolean\" },\n    \"reason\": { \"type\": \"string\" },\n    \"customer_name\": { \"type\": \"string\" }\n  },\n  \"required\": [\"reply\", \"escalate\", \"reason\", \"customer_name\"]\n}"
+      },
+      "name": "Structured Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -336,
+        368
+      ],
+      "id": "c730e3e0-f661-4b82-8308-517733cd3ea2"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1344372578754545",
+        "recipientPhoneNumber": "={{ $('Extract Message').item.json.phone }}",
+        "textBody": "={{ $json.output.reply }}",
+        "additionalFields": {}
+      },
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -448,
+        -16
+      ],
+      "id": "7a2b0c85-a2d9-4591-81c2-86606ef6f32b",
+      "webhookId": "809c2e34-ef66-464c-8c16-dba773b60163",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Llcq0yxNQb7rGWbB",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "=appXkPqjhGYqthFL7",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblb7fBpGWAC9A79r",
+          "mode": "list",
+          "cachedResultName": "Conversations",
+          "cachedResultUrl": "https://airtable.com/appXkPqjhGYqthFL7/tblb7fBpGWAC9A79r"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone": "={{ $('Extract Message').item.json.phone }}",
+            "CustomerMessage": "={{ $('Extract Message').item.json.text }}",
+            "BotReply": "={{ $('AI Agent').item.json.output.reply }}",
+            "HandledBy": "Bot"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "CustomerMessage",
+              "displayName": "CustomerMessage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "BotReply",
+              "displayName": "BotReply",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "HandledBy",
+              "displayName": "HandledBy",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Bot",
+                  "value": "Bot"
+                },
+                {
+                  "name": "Human",
+                  "value": "Human"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "Log Conversation",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "a6ebb34f-5910-468e-a5e3-218198653ecf",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zSR1HswGqLzJ748p",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{ $('AI Agent').item.json.output.escalate }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Needs Human?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "29ac8c0d-0f7e-42f6-8e10-5fafa29d2b48"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "=appXkPqjhGYqthFL7",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblXEGkZFoErGQx6F",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appXkPqjhGYqthFL7/tblXEGkZFoErGQx6F"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone": "={{ $('Extract Message').item.json.phone }}",
+            "Status": "Human"
+          },
+          "matchingColumns": [
+            "Phone"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Bot",
+                  "value": "Bot"
+                },
+                {
+                  "name": "Human",
+                  "value": "Human"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "Set Customer To Human",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        288,
+        -128
+      ],
+      "id": "44eee219-1827-4a27-a2cb-1d5930c08879",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zSR1HswGqLzJ748p",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "=appXkPqjhGYqthFL7",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAEChZ23FAdeWu4",
+          "mode": "list",
+          "cachedResultName": "Escalations",
+          "cachedResultUrl": "https://airtable.com/appXkPqjhGYqthFL7/tblAEChZ23FAdeWu4"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone": "={{ $('Extract Message').item.json.phone }}",
+            "Reason": "={{ $('AI Agent').item.json.output?.reason || 'Bot error' }}",
+            "Handled": "No"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Handled",
+              "displayName": "Handled",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "name": "No",
+                  "value": "No"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "name": "Log Escalation",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        -128
+      ],
+      "id": "13c25255-e309-416f-aaee-4a90d08dbefd",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zSR1HswGqLzJ748p",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1344372578754545",
+        "recipientPhoneNumber": "+2349118239822",
+        "textBody": "=={{ '🚨 Customer needs you\\nName: ' + ($('AI Agent').item.json.output?.customer_name || $('Extract Message').item.json.name) + '\\nNumber: ' + $('Extract Message').item.json.phone + '\\nChat: https://wa.me/' + $('Extract Message').item.json.phone + '\\nReason: ' + ($('AI Agent').item.json.output?.reason || 'Bot error') + '\\nTheir last message: ' + $('Extract Message').item.json.text }}",
+        "additionalFields": {}
+      },
+      "name": "Alert Owner",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        -128
+      ],
+      "id": "da181277-a651-42f5-834d-5f608214e24a",
+      "webhookId": "2c8aae59-f72c-4dbb-bcf2-2447b7954ffe",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Llcq0yxNQb7rGWbB",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1344372578754545",
+        "recipientPhoneNumber": "={{ $('Extract Message').item.json.phone }}",
+        "textBody": "Sorry, I am having a small problem right now. A team member will reply to you shortly.",
+        "additionalFields": {}
+      },
+      "name": "Send Fallback",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        160
+      ],
+      "id": "f5d10c75-f12f-4f11-baee-cb7ead1e3318",
+      "webhookId": "8a4b794c-f522-4c0d-b5e0-8583ea0af092",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "Llcq0yxNQb7rGWbB",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -672,
+        608
+      ],
+      "id": "1c1af9b9-20c4-4965-9366-714cfe0bbb76",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "amarachiconfidence75@gmail.com",
+          "mode": "list",
+          "cachedResultName": "amarachiconfidence75@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -1024,
+        448
+      ],
+      "id": "e4e56778-b4a7-4fe4-9b81-d14552766c91",
+      "name": "check availability",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "x1cQpbU3HtaAxEUj",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "=Search the Prime Motors knowledge base for car details, address, hours, payment, delivery and policies. Use for any factual question.\"",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "prime-motors-kb",
+          "mode": "list",
+          "cachedResultName": "prime-motors-kb"
+        },
+        "topK": 6,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -736,
+        432
+      ],
+      "id": "73cf0e50-1f43-4ce3-9b2b-692208be103c",
+      "name": "knowledge base",
+      "credentials": {
+        "pineconeApi": {
+          "id": "U9lsP0S7rddwlDlc",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "amarachiconfidence75@gmail.com",
+          "mode": "list",
+          "cachedResultName": "amarachiconfidence75@gmail.com"
+        },
+        "start": "={{ $fromAI(\"StartDate\") }}",
+        "end": "={{ $fromAI(\"EndDate\") }}",
+        "additionalFields": {
+          "attendees": [
+            "amarachiconfidence75@gmail.com"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          }
+        }
+      },
+      "id": "573ae8db-52db-49b3-94d1-fa9cc4a3dfc9",
+      "name": "Create event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -896,
+        496
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "x1cQpbU3HtaAxEUj",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "11BLlUP2T5EUVzSjIPRqPbz-IAsyeF0A8",
+          "mode": "list",
+          "cachedResultName": "prime motors",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/11BLlUP2T5EUVzSjIPRqPbz-IAsyeF0A8"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        80,
+        272
+      ],
+      "id": "11e61aab-9467-46cc-a9bf-40cdf4ee7bc8",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vXCX43U2JM6864Up",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1MNi4Lpgv7wCvRXYxl9jHnfIQDywExYGo",
+          "mode": "list",
+          "cachedResultName": "prime_motors_knowledge_base.md",
+          "cachedResultUrl": "https://drive.google.com/file/d/1MNi4Lpgv7wCvRXYxl9jHnfIQDywExYGo/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        304,
+        272
+      ],
+      "id": "ac5c2999-bc35-43fd-9e4a-03c2f67dc92c",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vXCX43U2JM6864Up",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "prime-motors-kb",
+          "mode": "list",
+          "cachedResultName": "prime-motors-kb"
+        },
+        "options": {
+          "clearNamespace": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        272
+      ],
+      "id": "db14e466-26f4-4680-a574-e4cd68c36388",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "U9lsP0S7rddwlDlc",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        464
+      ],
+      "id": "9327e037-b2b2-4c47-99f1-b6fb2b6a4c1a",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "textLoader",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        464
+      ],
+      "id": "4a874afa-ca0f-422d-a614-d43bc7ee80c7",
+      "name": "Default Data Loader"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Message": {
+      "main": [
+        [
+          {
+            "node": "Is Text Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Text Message": {
+      "main": [
+        [
+          {
+            "node": "Upsert Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Customer": {
+      "main": [
+        [
+          {
+            "node": "Human Handling?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Handling?": {
+      "main": [
+        [
+          {
+            "node": "Log Human Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Human Message": {
+      "main": [
+        [
+          {
+            "node": "Forward To Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reply": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "Needs Human?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Human?": {
+      "main": [
+        [
+          {
+            "node": "Set Customer To Human",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Fallback": {
+      "main": [
+        [
+          {
+            "node": "Set Customer To Human",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Customer To Human": {
+      "main": [
+        [
+          {
+            "node": "Log Escalation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Escalation": {
+      "main": [
+        [
+          {
+            "node": "Alert Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "knowledge base",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "knowledge base": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9ecb7167-aaca-465f-b93b-e827759b4968",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cfca839f3bae63c7536b8212d32611bf29e318c168fc8e4b2c2c1324df7462be"
+  },
+  "nodeGroups": [],
+  "id": "6cA2WB9AFpzP6MD5",
+  "tags": []
+}
